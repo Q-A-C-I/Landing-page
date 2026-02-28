@@ -87,12 +87,11 @@ export function ContestantForm() {
       })
       if (!res.ok) throw new Error("Submission failed")
       setSubmitted(true)
-      const payRes = await fetch("/api/flutterwave", {
+      const payRes = await fetch("/api/paystack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: 25000,
-          currency: "NGN",
           email: payload.email,
           phone: payload.phone,
           name: payload.full_name,
@@ -340,7 +339,7 @@ export function ContestantForm() {
           </button>
 
           <p className="text-center text-xs text-muted-foreground">
-            After submitting, you will be redirected to Flutterwave for a secure{" "}
+            After submitting, you will be redirected to Paystack for a secure{" "}
             {"₦"}25,000 payment. Your application is only considered after
             payment confirmation.
           </p>

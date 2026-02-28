@@ -10,6 +10,7 @@ function PaymentContent() {
   const status = params.get("status") || ""
   const txRef = params.get("tx_ref") || ""
   const transactionId = params.get("transaction_id") || ""
+  const reference = params.get("reference") || ""
   const success = status.toLowerCase() === "successful"
 
   return (
@@ -25,6 +26,7 @@ function PaymentContent() {
       <div className="mt-6 text-sm text-muted-foreground">
         <p>Reference: <span className="font-medium text-charcoal">{txRef || "N/A"}</span></p>
         <p>Transaction ID: <span className="font-medium text-charcoal">{transactionId || "N/A"}</span></p>
+        <p>Paystack Ref: <span className="font-medium text-charcoal">{reference || "N/A"}</span></p>
       </div>
     </div>
   )
