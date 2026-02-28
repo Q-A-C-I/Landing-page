@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* QACI Afro-modern palette */
+    --background: 33 100% 97%;       /* #FFF9F0 cream */
+    --foreground: 0 0% 17%;          /* #2B2B2B charcoal */
+    --card: 30 47% 92%;              /* #F5E6D3 warm beige */
+    --card-foreground: 0 0% 17%;
+    --popover: 33 100% 97%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 42 100% 37%;          /* #BF8F00 gold */
+    --primary-foreground: 0 0% 17%;
+    --secondary: 21 71% 56%;         /* #E07A3E deep orange */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 30 47% 92%;             /* warm beige */
+    --muted-foreground: 0 0% 40%;
+    --accent: 174 56% 55%;           /* #4ECDC4 turquoise */
+    --accent-foreground: 0 0% 17%;
+    --destructive: 352 66% 34%;      /* #8B2332 burgundy */
+    --destructive-foreground: 33 100% 97%;
+    --border: 30 30% 82%;
+    --input: 30 30% 82%;
+    --ring: 42 100% 37%;
+    --chart-1: 42 100% 37%;
+    --chart-2: 21 71% 56%;
+    --chart-3: 352 66% 34%;
+    --chart-4: 174 56% 55%;
+    --chart-5: 30 47% 92%;
+    --radius: 0.75rem;
+    --gold: #BF8F00;
+    --deep-orange: #E07A3E;
+    --burgundy: #8B2332;
+    --charcoal: #2B2B2B;
+    --warm-beige: #F5E6D3;
+    --cream: #FFF9F0;
+    --turquoise: #4ECDC4;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Hide scrollbars globally */
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Kente-inspired decorative pattern as SVG background */
+.kente-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M0 0h30v30H0zM30 30h30v30H30z' fill='%23BF8F00' fill-opacity='.04'/%3E%3Cpath d='M30 0h30v30H30zM0 30h30v30H0z' fill='%238B2332' fill-opacity='.03'/%3E%3Cpath d='M15 0v60M45 0v60M0 15h60M0 45h60' stroke='%23BF8F00' stroke-opacity='.04' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.mudcloth-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23BF8F00' fill-opacity='.03'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='0' cy='0' r='2'/%3E%3Ccircle cx='40' cy='0' r='2'/%3E%3Ccircle cx='0' cy='40' r='2'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3Cpath d='M10 0v40M30 0v40M0 10h40M0 30h40' stroke='%232B2B2B' stroke-opacity='.02' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Stagger animation utility */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(191, 143, 0, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(191, 143, 0, 0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-ticker {
+  animation: ticker 20s linear infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* Form input styles */
+.form-input {
+  @apply w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-opacity-20 transition-colors;
+}
