@@ -134,6 +134,7 @@ export default function AdminPanelPage() {
                   {rows.map((r) => {
                     const displayName =
                       r.full_name || r.brand_name || r.company || r.email || `ID ${r.id}`
+                    const paid = r.paid === true || String(r.payment_status || "").toLowerCase() === "success"
                     return (
                       <button
                         key={r.id}
@@ -145,7 +146,14 @@ export default function AdminPanelPage() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-semibold text-charcoal">{displayName}</span>
-                          <span className="text-xs text-muted-foreground">#{r.id}</span>
+                          <span className="flex items-center gap-2">
+                            {activeTable === "contestant_applications" && (
+                              <span className={`rounded px-2 py-0.5 text-xs ${paid ? "bg-gold/20 text-gold" : "bg-red-100 text-red-700"}`}>
+                                {paid ? "Paid" : "Unpaid"}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground">#{r.id}</span>
+                          </span>
                         </div>
                         {activeTable === "contestant_applications" && r.headshot_url ? (
                           <div className="mt-2 overflow-hidden rounded-md">

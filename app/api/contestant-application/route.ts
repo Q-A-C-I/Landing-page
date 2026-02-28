@@ -16,6 +16,11 @@ export async function POST(req: Request) {
       story: String(body.story || "").trim(),
       talent_description: String(body.talent_description || "").trim(),
       social_links: String(body.social_links || "").trim(),
+      video_url: String(body.video_url || "").trim(),
+      portfolio_urls: Array.isArray(body.portfolio_urls) ? body.portfolio_urls : [],
+      headshot_url: String(body.headshot_url || "").trim(),
+      full_body_url: String(body.full_body_url || "").trim(),
+      payment_status: "pending",
     }
     if (!data.full_name || !data.email || !data.phone) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })

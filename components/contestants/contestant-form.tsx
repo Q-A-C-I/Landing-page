@@ -100,6 +100,14 @@ export function ContestantForm() {
       if (!payRes.ok) throw new Error("Payment initialization failed")
       const payJson = await payRes.json()
       const link = String(payJson.link || "")
+      const reference = String(payJson.reference || "")
+      if (reference) {
+        await fetch("/api/contestant-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: payload.email, reference }),
+        })
+      }
       if (!link) throw new Error("No payment link")
       window.location.href = link
     } catch (err) {

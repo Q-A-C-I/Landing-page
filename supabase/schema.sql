@@ -58,6 +58,9 @@ create table if not exists public.contestant_applications (
   created_at timestamptz default now()
 );
 create unique index if not exists contestant_applications_email_unique on public.contestant_applications (email);
+alter table public.contestant_applications add column if not exists payment_reference text;
+alter table public.contestant_applications add column if not exists payment_status text default 'pending';
+alter table public.contestant_applications add column if not exists paid boolean default false;
 
 do $$
 begin
@@ -72,3 +75,11 @@ begin
     insert into storage.buckets (id, name, public) values ('exhibitor-assets', 'exhibitor-assets', true);
   end if;
 end$$;
+
+create table if not exists public.paystack_webhooks (
+  id bigserial primary key,
+  reference text,
+  event jsonb not null,
+  created_at timestamptz default now()
+);
+create index if not exists paystack_webhooks_reference_idx on public.paystack_webhooks (reference);
