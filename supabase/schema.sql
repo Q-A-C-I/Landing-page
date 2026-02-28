@@ -83,3 +83,30 @@ create table if not exists public.paystack_webhooks (
   created_at timestamptz default now()
 );
 create index if not exists paystack_webhooks_reference_idx on public.paystack_webhooks (reference);
+
+-- Storage write policies for client uploads (public role)
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'allow_public_upload_contestant'
+  ) then
+    create policy allow_public_upload_contestant
+      on storage.objects
+      for insert
+      to public
+      with check (bucket_id = 'contestant-assets');
+  end if;
+end$$;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'allow_public_upload_exhibitor'
+  ) then
+    create policy allow_public_upload_exhibitor
+      on storage.objects
+      for insert
+      to public
+      with check (bucket_id = 'exhibitor-assets');
+  end if;
+end$$;
