@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { SectionWrapper } from "@/components/section-wrapper"
+import { getSupabaseClient } from "@/lib/supabase-client"
 import { africanCountries } from "@/lib/african-countries"
 
 const educationLevels = [
@@ -32,15 +33,16 @@ export function ContestantForm() {
     setSubmitting(true)
     const fd = new FormData(e.currentTarget)
     async function uploadFile(file: File, keyPrefix: string) {
-      const up = new FormData()
-      up.append("file", file)
-      up.append("bucket", "contestant-assets")
+      const supabase = getSupabaseClient()
       const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
-      up.append("path", `${keyPrefix}/${safeName}`)
-      const res = await fetch("/api/upload", { method: "POST", body: up })
-      if (!res.ok) throw new Error("Upload failed")
-      const json = await res.json()
-      return String(json.url || "")
+      const path = `${keyPrefix}/${safeName}`
+      const { error } = await supabase.storage.from("contestant-assets").upload(path, file, {
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      })
+      if (error) throw new Error(error.message)
+      const pub = supabase.storage.from("contestant-assets").getPublicUrl(path)
+      return String(pub.data.publicUrl || "")
     }
     const payload = {
       full_name: String(fd.get("full_name") || ""),
