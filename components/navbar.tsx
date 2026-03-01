@@ -84,7 +84,7 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {isOpen && (
-        <div className="kente-pattern fixed inset-0 top-[72px] z-40 bg-warm-beige lg:hidden">
+        <div className="fixed inset-0 top-[72px] z-40 bg-cream lg:hidden">
           <div className="flex flex-col gap-2 p-6">
             {navLinks.map((link) => (
               <Link

@@ -83,6 +83,25 @@ export default function AdminPanelPage() {
     }
   }
 
+  function ensurePublicUrl(url: string) {
+    if (!url) return url
+    const needle = "/storage/v1/object/"
+    const pub = "/storage/v1/object/public/"
+    if (url.includes(needle) && !url.includes(pub)) {
+      return url.replace(needle, pub)
+    }
+    return url
+  }
+  function isImage(url: string) {
+    return /\.(png|jpg|jpeg|gif|webp|avif)$/i.test(url)
+  }
+  function isVideo(url: string) {
+    return /\.(mp4|webm|ogg)$/i.test(url)
+  }
+  function isPdf(url: string) {
+    return /\.pdf$/i.test(url)
+  }
+
   return (
     <SectionWrapper>
       <div className="mx-auto max-w-6xl">
@@ -135,6 +154,10 @@ export default function AdminPanelPage() {
                     const displayName =
                       r.full_name || r.brand_name || r.company || r.email || `ID ${r.id}`
                     const paid = r.paid === true || String(r.payment_status || "").toLowerCase() === "success"
+                    const firstPhoto =
+                      Array.isArray(r.product_photos_urls) && r.product_photos_urls.length
+                        ? ensurePublicUrl(String(r.product_photos_urls[0]))
+                        : ""
                     return (
                       <button
                         key={r.id}
@@ -155,13 +178,26 @@ export default function AdminPanelPage() {
                             <span className="text-xs text-muted-foreground">#{r.id}</span>
                           </span>
                         </div>
+                        {activeTable === "exhibitor_applications" && firstPhoto && isImage(firstPhoto) ? (
+                          <div className="mt-2 overflow-hidden rounded-md">
+                            <Image
+                              src={firstPhoto}
+                              alt="Product"
+                              width={400}
+                              height={300}
+                              unoptimized
+                              className="h-28 w-full object-cover"
+                            />
+                          </div>
+                        ) : null}
                         {activeTable === "contestant_applications" && r.headshot_url ? (
                           <div className="mt-2 overflow-hidden rounded-md">
                             <Image
-                              src={r.headshot_url}
+                              src={ensurePublicUrl(r.headshot_url)}
                               alt="Headshot"
                               width={400}
                               height={300}
+                              unoptimized
                               className="h-28 w-full object-cover"
                             />
                           </div>
@@ -181,10 +217,11 @@ export default function AdminPanelPage() {
                         {activeTable === "contestant_applications" && selected.headshot_url ? (
                           <div className="overflow-hidden rounded-md">
                             <Image
-                              src={selected.headshot_url}
+                              src={ensurePublicUrl(selected.headshot_url)}
                               alt="Headshot"
                               width={600}
                               height={400}
+                              unoptimized
                               className="h-48 w-full object-cover"
                             />
                           </div>
@@ -204,37 +241,82 @@ export default function AdminPanelPage() {
                         </div>
 
                         {activeTable === "contestant_applications" ? (
-                          <div className="space-y-2">
-                            {selected.video_url ? (
-                              <button
-                                className="w-full rounded border px-3 py-2 text-sm hover:border-gold"
-                                onClick={() => window.open(String(selected.video_url), "_blank")}
-                              >
-                                View Intro Video
-                              </button>
+                          <div className="space-y-3">
+                            {selected.video_url && isVideo(ensurePublicUrl(String(selected.video_url))) ? (
+                              <video controls className="w-full rounded-md" src={ensurePublicUrl(String(selected.video_url))} />
                             ) : null}
-                            {selected.full_body_url ? (
-                              <button
-                                className="w-full rounded border px-3 py-2 text-sm hover:border-gold"
-                                onClick={() => window.open(String(selected.full_body_url), "_blank")}
-                              >
-                                View Full-Body Photo
-                              </button>
+                            {selected.full_body_url && isImage(ensurePublicUrl(String(selected.full_body_url))) ? (
+                              <div className="overflow-hidden rounded-md">
+                                <Image
+                                  src={ensurePublicUrl(String(selected.full_body_url))}
+                                  alt="Full Body"
+                                  width={1000}
+                                  height={700}
+                                  unoptimized
+                                  className="w-full h-auto object-cover"
+                                />
+                              </div>
                             ) : null}
                             {Array.isArray(selected.portfolio_urls) && selected.portfolio_urls.length > 0 ? (
-                              <button
-                                className="w-full rounded border px-3 py-2 text-sm hover:border-gold"
-                                onClick={() => {
-                                  const urls = selected.portfolio_urls as any[]
-                                  urls.forEach((u) => {
-                                    const link = typeof u === "string" ? u : u?.url || ""
-                                    if (link) window.open(link, "_blank")
-                                  })
-                                }}
-                              >
-                                View Portfolio Files
-                              </button>
+                              <div className="grid grid-cols-2 gap-3">
+                                {(selected.portfolio_urls as any[]).map((u, i) => {
+                                  const link = ensurePublicUrl(typeof u === "string" ? u : u?.url || "")
+                                  if (!link) return null
+                                  return (
+                                    <div key={i} className="rounded border p-2">
+                                      {isImage(link) ? (
+                                        <Image src={link} alt="File" width={600} height={400} unoptimized className="w-full h-32 object-cover rounded" />
+                                      ) : isVideo(link) ? (
+                                        <video controls className="w-full rounded" src={link} />
+                                      ) : isPdf(link) ? (
+                                        <iframe className="w-full h-40 rounded" src={link} />
+                                      ) : (
+                                        <a className="text-gold underline" href={link} target="_blank" rel="noreferrer">
+                                          {link}
+                                        </a>
+                                      )}
+                                      <div className="mt-2 flex gap-2">
+                                        <a className="rounded border px-2 py-1 text-xs" href={link} target="_blank" rel="noreferrer">
+                                          Open
+                                        </a>
+                                        <a className="rounded border px-2 py-1 text-xs" href={link} download>
+                                          Download
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
                             ) : null}
+                          </div>
+                        ) : null}
+                        {activeTable === "exhibitor_applications" && Array.isArray(selected.product_photos_urls) && selected.product_photos_urls.length > 0 ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              {(selected.product_photos_urls as any[]).map((u, i) => {
+                                const link = ensurePublicUrl(typeof u === "string" ? u : u?.url || "")
+                                if (!link) return null
+                                return (
+                                  <div key={i} className="rounded border p-2">
+                                    {isImage(link) ? (
+                                      <Image src={link} alt="Product" width={600} height={400} unoptimized className="w-full h-32 object-cover rounded" />
+                                    ) : (
+                                      <a className="text-gold underline" href={link} target="_blank" rel="noreferrer">
+                                        {link}
+                                      </a>
+                                    )}
+                                    <div className="mt-2 flex gap-2">
+                                      <a className="rounded border px-2 py-1 text-xs" href={link} target="_blank" rel="noreferrer">
+                                        Open
+                                      </a>
+                                      <a className="rounded border px-2 py-1 text-xs" href={link} download>
+                                        Download
+                                      </a>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
                         ) : null}
                       </div>
