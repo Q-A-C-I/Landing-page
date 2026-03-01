@@ -43,9 +43,16 @@ export function ExhibitorForm() {
       const supabase = getSupabaseClient()
       const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
       const path = `${keyPrefix}/${safeName}`
-      const { error } = await supabase.storage.from("exhibitor-assets").upload(path, file, {
+      const signedRes = await fetch("/api/storage/signed-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket: "exhibitor-assets", path }),
+      })
+      if (!signedRes.ok) throw new Error("Could not create signed upload url")
+      const signed = await signedRes.json()
+      const token = String(signed.token || "")
+      const { error } = await supabase.storage.from("exhibitor-assets").uploadToSignedUrl(path, token, file, {
         contentType: file.type || "application/octet-stream",
-        upsert: true,
       })
       if (error) throw new Error(error.message)
       const pub = supabase.storage.from("exhibitor-assets").getPublicUrl(path)
